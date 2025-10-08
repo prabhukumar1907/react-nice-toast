@@ -12,9 +12,18 @@ import {
   Wifi,
   WifiOff,
   Star,
+  X,
 } from "lucide-react";
 import { FaRegCircleCheck } from "react-icons/fa6";
-interface ToastProps extends ToastData {
+interface ToastExtraProps {
+  showProgressBar: boolean;
+  showIcon: boolean;
+  closeOnClick: boolean;
+  pauseOnHover: boolean;
+  theme: "light" | "dark";
+}
+
+interface ToastProps extends ToastData, ToastExtraProps {
   onRemove: (id: number) => void;
 }
 
@@ -22,21 +31,32 @@ const Toast: React.FC<ToastProps> = ({
   id,
   message,
   type,
-  duration,
+  duration = 5000,
   className,
   onRemove,
+  showProgressBar = true,
+  showIcon = true,
+  closeOnClick = true,
+  pauseOnHover = true,
+  theme = "light",
+  transition = "slide",
 }) => {
   const [isExiting, setIsExiting] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
+    if (!duration || paused) return;
     const timer = setTimeout(() => handleClose(), duration);
     return () => clearTimeout(timer);
-  }, [duration]);
+  }, [duration, paused]);
 
   const handleClose = (): void => {
     setIsExiting(true);
-    setTimeout(() => onRemove(id), 300);
+    setTimeout(() => onRemove(id), 100);
   };
+
+  const handleMouseEnter = () => pauseOnHover && setPaused(true);
+  const handleMouseLeave = () => pauseOnHover && setPaused(false);
 
   const getTypeStyles = (): string => {
     switch (type) {
@@ -135,20 +155,6 @@ const Toast: React.FC<ToastProps> = ({
         return "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 dark:from-amber-500 dark:via-amber-600 dark:to-orange-600";
       case ToastType.LOADING:
         return "bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 dark:from-teal-500 dark:via-teal-600 dark:to-teal-700";
-      case ToastType.UPDATE:
-        return "bg-gradient-to-r from-indigo-400 via-indigo-500 to-indigo-500 dark:from-indigo-500 dark:via-indigo-600 dark:to-indigo-600";
-      case ToastType.DELETE:
-        return "bg-gradient-to-r from-red-500 via-red-600 to-red-600 dark:from-red-600 dark:via-red-700 dark:to-red-700";
-      case ToastType.UPLOAD:
-        return "bg-gradient-to-r from-purple-400 via-purple-500 to-purple-500 dark:from-purple-500 dark:via-purple-600 dark:to-purple-600";
-      case ToastType.DOWNLOAD:
-        return "bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-500 dark:from-cyan-500 dark:via-cyan-600 dark:to-cyan-600";
-      case ToastType.NETWORK:
-        return "bg-gradient-to-r from-teal-400 via-teal-500 to-teal-500 dark:from-teal-500 dark:via-teal-600 dark:to-teal-600";
-      case ToastType.OFFLINE:
-        return "bg-gradient-to-r from-gray-500 via-gray-500 to-gray-500 dark:from-gray-600 dark:via-gray-600 dark:to-gray-600";
-      case ToastType.CUSTOM:
-        return "bg-gradient-to-r from-purple-500 via-purple-600 to-purple-600 dark:from-purple-600 dark:via-purple-700 dark:to-purple-700";
       default:
         return "bg-gradient-to-r from-blue-400 via-blue-500 to-cyan-500 dark:from-blue-500 dark:via-blue-600 dark:to-cyan-600";
     }
@@ -159,17 +165,6 @@ const Toast: React.FC<ToastProps> = ({
     switch (type) {
       case ToastType.SUCCESS:
         return <FaRegCircleCheck className={iconClass} />;
-      // case ToastType.SUCCESS:
-      //   return (
-      //     <svg className={iconClass} fill="currentColor" viewBox="0 0 20 20">
-      //       {" "}
-      //       <path
-      //         fillRule="evenodd"
-      //         d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-      //         clipRule="evenodd"
-      //       />{" "}
-      //     </svg>
-      //   );
       case ToastType.ERROR:
         return <XCircle className={iconClass} />;
       case ToastType.WARNING:
@@ -202,8 +197,18 @@ const Toast: React.FC<ToastProps> = ({
       className={`
         relative overflow-hidden flex items-center gap-3 
         min-w-[320px] max-w-md px-2.5 py-2.5 rounded-lg
-        bg-white dark:bg-gray-900 shadow-lg border-1 ${getTypeStyles()}
+        ${
+          theme === "light" ? "bg-white" : "bg-gray-900"
+        } shadow-lg border-1 ${getTypeStyles()}
         transition-all duration-300 ease-out
+        ${transition === "bounce" ? "animate-bounce" : ""}
+        ${
+          transition === "fade"
+            ? "opacity-100 transition-opacity duration-500"
+            : ""
+        }
+        ${transition === "slide" ? "translate-y-0" : ""}
+        ${transition === "zoom" ? "scale-105" : ""}
         ${
           isExiting
             ? "opacity-0 translate-y-2 scale-95"
@@ -214,24 +219,33 @@ const Toast: React.FC<ToastProps> = ({
       `}
       role="alert"
       aria-live="polite"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={() => closeOnClick && handleClose()}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-gray-50/20 dark:from-gray-800 dark:via-transparent dark:to-gray-700/20 pointer-events-none" />
 
-      <div
-        className={`relative flex-shrink-0 w-7 h-7 rounded-full ${getIconBgColor()} ${getIconColor()} 
-                    flex items-center justify-center shadow-lg ring-1 ring-black/10 dark:ring-white/20`}
-        aria-hidden="true"
-      >
-        {getIcon()}
-      </div>
+      {showIcon && (
+        <div
+          className={`relative flex-shrink-0 w-7 h-7 rounded-full ${getIconBgColor()} ${getIconColor()} 
+                      flex items-center justify-center shadow-lg ring-1 ring-black/10 dark:ring-white/20`}
+          aria-hidden="true"
+        >
+          {getIcon()}
+        </div>
+      )}
 
       <div className="relative flex-1 min-w-0">
-        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-snug tracking-tight">
+        <p
+          className={`text-sm font-semibold leading-snug tracking-tight 
+                ${theme === "dark" ? "text-white" : "text-gray-900"} 
+                dark:text-gray-100`}
+        >
           {message}
         </p>
       </div>
-
-      <button
+      {/* SVG Button */}
+      {/* <button
         onClick={handleClose}
         className="relative flex-shrink-0 left-1.5 text-gray-400 dark:text-gray-500 cursor-pointer 
                    hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 
@@ -252,34 +266,35 @@ const Toast: React.FC<ToastProps> = ({
             d="M6 18L18 6M6 6l12 12"
           />
         </svg>
+      </button> */}
+      {/* Icon Button  */}
+      <button
+        onClick={handleClose}
+        className="relative flex-shrink-0 left-1.5 text-gray-400 dark:text-gray-500 cursor-pointer 
+             hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 
+             focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600
+             rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:rotate-90"
+        aria-label="Close notification"
+      >
+        <X className="w-4 h-4" />
       </button>
 
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-100/80 dark:bg-gray-800/70 overflow-hidden rounded-b-xl">
-        <div
-          className={`${getProgressColor()} h-full animate-progress relative overflow-hidden shadow-sm`}
-          style={{
-            animationDuration: `${duration}ms`,
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent dark:via-gray-200/20 animate-shimmer" />
+      {showProgressBar && (
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-100/80 dark:bg-gray-800/70 overflow-hidden rounded-b-xl">
+          <div
+            className={`${getProgressColor()} h-full animate-progress relative overflow-hidden shadow-sm`}
+            style={{ animationDuration: `${duration}ms` }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent dark:via-gray-200/20 animate-shimmer" />
+          </div>
         </div>
-      </div>
+      )}
 
       <style>{`
-        @keyframes progress {
-          from { width: 100%; }
-          to { width: 0%; }
-        }
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(200%); }
-        }
-        .animate-progress {
-          animation: progress linear forwards;
-        }
-        .animate-shimmer {
-          animation: shimmer 2s infinite;
-        }
+        @keyframes progress { from { width: 100%; } to { width: 0%; } }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+        .animate-progress { animation: progress linear forwards; }
+        .animate-shimmer { animation: shimmer 2s infinite; }
       `}</style>
     </div>
   );

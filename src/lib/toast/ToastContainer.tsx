@@ -6,11 +6,24 @@ import { Position, type ToastData } from "./types";
 interface ToastContainerProps {
   position?: Position;
   maxToasts?: number;
+  showIcon?: boolean;
+  showProgressBar?: boolean;
+  closeOnClick?: boolean;
+  pauseOnHover?: boolean;
+  theme?: "light" | "dark";
+  transition?: "slide" | "zoom" | "bounce" | "fade";
+
 }
 
 const ToastContainer: React.FC<ToastContainerProps> = ({
   position = Position.TOP_RIGHT,
   maxToasts = 5,
+  showIcon = true,
+  showProgressBar = true,
+  closeOnClick = false,
+  pauseOnHover = false,
+  theme = "light",
+  transition = "slide",
 }) => {
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
@@ -51,6 +64,12 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
           key={toastData.id}
           {...toastData}
           onRemove={toastManager.remove.bind(toastManager)}
+          showIcon={showIcon}
+          showProgressBar={showProgressBar}
+          closeOnClick={closeOnClick}
+          pauseOnHover={pauseOnHover}
+          theme={theme}
+          transition={transition}
         />
       ))}
     </div>

@@ -1,3 +1,4 @@
+// types.ts
 export const ToastType = {
   SUCCESS: 'success',
   ERROR: 'error',
@@ -15,7 +16,6 @@ export const ToastType = {
 
 export type ToastType = (typeof ToastType)[keyof typeof ToastType];
 
-// Toast Positions
 export const Position = {
   TOP_LEFT: 'top-left',
   TOP_CENTER: 'top-center',
@@ -27,17 +27,21 @@ export const Position = {
 
 export type Position = (typeof Position)[keyof typeof Position];
 
+export type Theme = 'light' | 'dark';
+export type Transition = 'fade' | 'slide' | 'bounce'|'zoom';
+
 export interface ToastOptions {
   type?: ToastType;
-  duration?: number;
+  duration?: number; 
   position?: Position;
+  showProgressBar?: boolean;
+  showIcon?: boolean;
+  closeOnClick?: boolean;
+  newestOnTop?:boolean;
+  pauseOnHover?: boolean;
+  theme?: Theme;
+  transition?: Transition;
   className?: string;
-}
-
-export interface ToastPromiseOptions {
-  pending: string | ToastOptions;
-  success: string | ToastOptions;
-  error: string | ToastOptions;
 }
 
 export interface ToastData extends Required<Omit<ToastOptions, 'position' | 'className'>> {
