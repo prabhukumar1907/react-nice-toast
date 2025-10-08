@@ -1,12 +1,6 @@
 import { useState } from "react";
 import { ToastContainer, toast, Position } from "./lib/toast";
-import {
-  FiStar,
-  FiClock,
-  FiTool,
-  FiPlay,
-  FiArrowRight,
-} from "react-icons/fi";
+import { FiStar, FiClock, FiTool, FiPlay, FiArrowRight } from "react-icons/fi";
 import {
   CheckCircle,
   XCircle,
@@ -17,6 +11,7 @@ import {
   WifiOff,
   RefreshCw,
   Loader2,
+  ChevronsDown,
 } from "lucide-react";
 
 function App() {
@@ -91,7 +86,7 @@ function App() {
       <nav className="w-full bg-gradient-to-r from-blue-400 via-teal-400 to-purple-400 shadow-lg sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <h1 className="text-2xl md:text-3xl font-extrabold text-white drop-shadow-md">
-            React-Nice-Toast
+            🎉React-Nice-Toast
           </h1>
 
           {/* Desktop Links */}
@@ -168,7 +163,7 @@ function App() {
       </nav>
 
       {/* Hero Section */}
-      <header className="relative py-12 shadow-2xl px-6 bg-gradient-to-tr from-blue-400 via-teal-400 to-purple-400 text-gray-900 overflow-hidden">
+      <header className="relative py-14 shadow-2xl px-6 mb-3 bg-gradient-to-tr from-blue-400 via-teal-400 to-purple-400 text-gray-900 overflow-hidden">
         <div className="absolute top-0 left-0 w-72 h-72 bg-blue-200 rounded-full opacity-30 -translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-200 rounded-full opacity-30 translate-x-1/3 translate-y-1/3"></div>
 
@@ -205,7 +200,9 @@ function App() {
           {/* Import CSS */}
           <div className="max-w-lg mx-auto mt-8 bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center gap-4">
             <p className="text-gray-700 text-center">
-              Also, import the default styles:
+              To apply default styles, import them in your{" "}
+              <span className="font-semibold">index.css</span> or{" "}
+              <span className="font-semibold">App.css</span>:
             </p>
             <div className="flex items-center gap-2 bg-gray-100 text-gray-600 py-2 px-4 rounded-lg font-mono w-full justify-between">
               <span>import "react-nice-toast/styles.css";</span>
@@ -224,26 +221,36 @@ function App() {
           </div>
 
           {/* CTA Button */}
-          <div className="mt-10">
+          <div className="mt-4">
             <button
               onClick={() => toast.success("Installation successful!")}
-              className="px-6 py-4 bg-gradient-to-tr from-amber-400 via-pink-500 to-rose-500 cursor-pointer text-white font-bold rounded-full shadow-lg transition-all hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,180,200,0.6)]"
+              className="px-6 py-4 bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 text-white cursor-pointer font-bold rounded-full shadow-lg transition-all hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,180,200,0.6)]"
             >
               Try Now
             </button>
           </div>
 
           {/* Footer Note */}
-          <p className="mt-6 text-white/80 text-sm">
+          <p className="mt-2 text-white/80 text-sm">
             Made with ❤️ using React, Tailwind CSS, and Framer Motion
           </p>
+        </div>
+
+        {/* Scroll Down Indicator */}
+        <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 shadow-lg flex items-center justify-center">
+            <a href="#features">
+              {" "}
+              <ChevronsDown className="h-6 w-6 text-white cursor-pointer" />
+            </a>
+          </div>
         </div>
       </header>
 
       {/* Features Section */}
       <section
         id="features"
-        className="py-12 px-6 relative overflow-hidden text-gray-900 bg-transparent shadow-lg"
+        className="py-20 px-6 relative overflow-hidden text-gray-900 bg-transparent shadow-lg"
       >
         <div className="absolute -top-16 -left-16 w-40 h-40 bg-blue-200 rounded-full opacity-30 blur-2xl"></div>
         <div className="absolute -bottom-16 -right-16 w-56 h-56 bg-purple-200 rounded-full opacity-30 blur-2xl"></div>
