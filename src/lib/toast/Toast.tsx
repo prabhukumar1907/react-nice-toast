@@ -215,11 +215,11 @@ const Toast: React.FC<ToastProps> = ({
       role="alert"
       aria-live="polite"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-gray-50/30 dark:from-gray-800 dark:via-transparent dark:to-gray-700/20 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-gray-50/20 dark:from-gray-800 dark:via-transparent dark:to-gray-700/20 pointer-events-none" />
 
       <div
         className={`relative flex-shrink-0 w-7 h-7 rounded-full ${getIconBgColor()} ${getIconColor()} 
-                    flex items-center justify-center shadow-sm ring-1 ring-black/5 dark:ring-white/10`}
+                    flex items-center justify-center shadow-lg ring-1 ring-black/10 dark:ring-white/20`}
         aria-hidden="true"
       >
         {getIcon()}
