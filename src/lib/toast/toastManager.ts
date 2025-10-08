@@ -29,6 +29,13 @@ class ToastManager {
     return id;
   }
 
+  update(id: number, options: Partial<Omit<ToastData, "id">>): void {
+    this.toasts = this.toasts.map(toast =>
+      toast.id === id ? { ...toast, ...options } : toast
+    );
+    this.notify();
+  }
+
   remove(id: number): void {
     this.toasts = this.toasts.filter(toast => toast.id !== id);
     this.notify();
@@ -40,6 +47,7 @@ class ToastManager {
   }
 }
 
+// Singleton instance
 export const toastManager = new ToastManager();
 
 // Main toast function
@@ -47,18 +55,67 @@ export const toast = (message: string, options?: ToastOptions): number => {
   return toastManager.add(message, options);
 };
 
-// Convenience methods
-toast.success = (message: string, options?: Omit<ToastOptions, 'type'>): number => 
+// Methods for each toast type
+toast.success = (message: string, options?: Omit<ToastOptions, "type">) =>
   toast(message, { ...options, type: ToastType.SUCCESS });
 
-toast.error = (message: string, options?: Omit<ToastOptions, 'type'>): number => 
+toast.error = (message: string, options?: Omit<ToastOptions, "type">) =>
   toast(message, { ...options, type: ToastType.ERROR });
 
-toast.warning = (message: string, options?: Omit<ToastOptions, 'type'>): number => 
+toast.warning = (message: string, options?: Omit<ToastOptions, "type">) =>
   toast(message, { ...options, type: ToastType.WARNING });
 
-toast.info = (message: string, options?: Omit<ToastOptions, 'type'>): number => 
+toast.info = (message: string, options?: Omit<ToastOptions, "type">) =>
   toast(message, { ...options, type: ToastType.INFO });
 
-toast.dismiss = (id: number): void => toastManager.remove(id);
-toast.clear = (): void => toastManager.clear();
+toast.loading = (message: string, options?: Omit<ToastOptions, "type">) =>
+  toast(message, { ...options, type: ToastType.LOADING });
+
+toast.update = (message: string, options?: Omit<ToastOptions, "type">) =>
+  toast(message, { ...options, type: ToastType.UPDATE });
+
+toast.delete = (message: string, options?: Omit<ToastOptions, "type">) =>
+  toast(message, { ...options, type: ToastType.DELETE });
+
+toast.upload = (message: string, options?: Omit<ToastOptions, "type">) =>
+  toast(message, { ...options, type: ToastType.UPLOAD });
+
+toast.download = (message: string, options?: Omit<ToastOptions, "type">) =>
+  toast(message, { ...options, type: ToastType.DOWNLOAD });
+
+toast.network = (message: string, options?: Omit<ToastOptions, "type">) =>
+  toast(message, { ...options, type: ToastType.NETWORK });
+
+toast.offline = (message: string, options?: Omit<ToastOptions, "type">) =>
+  toast(message, { ...options, type: ToastType.OFFLINE });
+
+toast.custom = (message: string, options?: Omit<ToastOptions, "type">) =>
+  toast(message, { ...options, type: ToastType.CUSTOM });
+
+// Dismiss and clear
+toast.dismiss = (id: number) => toastManager.remove(id);
+toast.clear = () => toastManager.clear();
+
+interface PromiseToastOptions {
+  loading: string;
+  success: string;
+  error: string;
+  duration?: number;
+}
+
+toast.promise = <T>(
+  promise: Promise<T>,
+  messages: PromiseToastOptions
+): Promise<T> => {
+  const id = toast.loading(messages.loading, { duration: 999999 });
+  promise
+    .then((res) => {
+      toastManager.update(id, { message: messages.success, type: ToastType.SUCCESS, duration: messages.duration || 3000 });
+      return res;
+    })
+    .catch((err) => {
+      toastManager.update(id, { message: messages.error, type: ToastType.ERROR, duration: messages.duration || 3000 });
+      throw err;
+    });
+  return promise;
+};

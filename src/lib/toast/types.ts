@@ -3,10 +3,19 @@ export const ToastType = {
   ERROR: 'error',
   WARNING: 'warning',
   INFO: 'info',
+  LOADING: 'loading',
+  UPDATE: 'update',
+  DELETE: 'delete',
+  UPLOAD: 'upload',
+  DOWNLOAD: 'download',
+  NETWORK: 'network',
+  OFFLINE: 'offline',
+  CUSTOM: 'custom',
 } as const;
 
 export type ToastType = (typeof ToastType)[keyof typeof ToastType];
 
+// Toast Positions
 export const Position = {
   TOP_LEFT: 'top-left',
   TOP_CENTER: 'top-center',
@@ -23,6 +32,12 @@ export interface ToastOptions {
   duration?: number;
   position?: Position;
   className?: string;
+}
+
+export interface ToastPromiseOptions {
+  pending: string | ToastOptions;
+  success: string | ToastOptions;
+  error: string | ToastOptions;
 }
 
 export interface ToastData extends Required<Omit<ToastOptions, 'position' | 'className'>> {

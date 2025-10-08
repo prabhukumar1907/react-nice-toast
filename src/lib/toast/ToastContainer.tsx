@@ -42,7 +42,8 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
 
   return (
     <div 
-      className={`fixed ${getPositionStyles()} z-50 flex flex-col gap-2`}
+      className={`fixed ${getPositionStyles()} z-50 flex flex-col gap-2 
+                  pointer-events-none`} 
       aria-live="polite"
       aria-atomic="false"
     >
