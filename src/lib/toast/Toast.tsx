@@ -40,12 +40,24 @@ const Toast: React.FC<ToastProps> = ({
   closeOnClick = false,
   pauseOnHover = false,
   theme = "light",
+  autoClose = true,
+  showCloseButton = true,
   transition = "slide",
 }) => {
   const [isExiting, setIsExiting] = useState(false);
   const [paused, setPaused] = useState(false);
 
+  // useEffect(() => {
+  //   if (!duration || paused) return;
+
+  //   const timer = setTimeout(() => handleClose(), duration);
+
+  //   return () => {
+  //     clearTimeout(timer);
+  //   };
+  // }, [duration, paused]);
   useEffect(() => {
+    if (!autoClose) return;
     if (!duration || paused) return;
 
     const timer = setTimeout(() => handleClose(), duration);
@@ -53,7 +65,7 @@ const Toast: React.FC<ToastProps> = ({
     return () => {
       clearTimeout(timer);
     };
-  }, [duration, paused]);
+  }, [duration, paused, autoClose]);
 
   const handleClose = (): void => {
     setIsExiting(true);
@@ -275,21 +287,22 @@ const Toast: React.FC<ToastProps> = ({
           {message}
         </p>
       </div>
-
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          handleClose();
-        }}
-        className="btn-close relative flex-shrink-0 text-gray-400 hover:cursor-pointer dark:text-gray-500
+      {showCloseButton && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClose();
+          }}
+          className="btn-close relative flex-shrink-0 text-gray-400 hover:cursor-pointer dark:text-gray-500
              hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 
              focus:outline-none rounded-full p-1 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
-        aria-label="Close notification"
-      >
-        <X className="w-4 h-4" />
-      </button>
+          aria-label="Close notification"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
 
-      {showProgressBar && duration && (
+      {showProgressBar && duration && autoClose && (
         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black/5 dark:bg-white/5 overflow-hidden rounded-b-xl">
           <div
             className={`${getProgressColor()} h-full progress-bar-animated`}

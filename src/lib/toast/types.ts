@@ -36,6 +36,8 @@ export interface ToastOptions {
   position?: Position;
   showProgressBar?: boolean;
   showIcon?: boolean;
+  showCloseButton?:boolean;
+  autoClose?:boolean;
   closeOnClick?: boolean;
   newestOnTop?:boolean;
   pauseOnHover?: boolean;
