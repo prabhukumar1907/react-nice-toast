@@ -1,150 +1,671 @@
-import { useEffect, useState, type JSX } from 'react';
-import { ToastType, type ToastData } from './types';
+import { useEffect, useState, type JSX } from "react";
+import { ToastType, type ToastData } from "./types";
+import {
+  XCircle,
+  AlertTriangle,
+  Info,
+  Loader2,
+  RefreshCw,
+  Trash2,
+  Upload,
+  Download,
+  Wifi,
+  WifiOff,
+  Star,
+  X,
+  CircleCheck,
+} from "lucide-react";
 
-interface ToastProps extends ToastData {
+interface ToastExtraProps {
+  showProgressBar: boolean;
+  showIcon: boolean;
+  closeOnClick: boolean;
+  pauseOnHover: boolean;
+  theme: "light" | "dark";
+}
+
+interface ToastProps extends ToastData, ToastExtraProps {
   onRemove: (id: number) => void;
 }
 
-const Toast: React.FC<ToastProps> = ({ id, message, type, duration, className, onRemove }) => {
+const Toast: React.FC<ToastProps> = ({
+  id,
+  message,
+  type,
+  duration = 5000,
+  className,
+  onRemove,
+  showProgressBar = true,
+  showIcon = true,
+  closeOnClick = false,
+  pauseOnHover = false,
+  theme = "light",
+  transition = "slide",
+}) => {
   const [isExiting, setIsExiting] = useState(false);
-  const [progress, setProgress] = useState(100);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    const startTime = Date.now();
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const remaining = Math.max(0, 100 - (elapsed / duration) * 100);
-      setProgress(remaining);
-    }, 10);
+    if (!duration || paused) return;
 
-    const timer = setTimeout(() => {
-      handleClose();
-    }, duration);
+    const timer = setTimeout(() => handleClose(), duration);
 
     return () => {
       clearTimeout(timer);
-      clearInterval(interval);
     };
-  }, [duration]);
+  }, [duration, paused]);
 
   const handleClose = (): void => {
     setIsExiting(true);
-    setTimeout(() => {
-      onRemove(id);
-    }, 400);
+    setTimeout(() => onRemove(id), 300);
   };
+
+  const handleMouseEnter = () => pauseOnHover && setPaused(true);
+  const handleMouseLeave = () => pauseOnHover && setPaused(false);
 
   const getTypeStyles = (): string => {
     switch (type) {
       case ToastType.SUCCESS:
-        return 'bg-gradient-to-r from-emerald-500 to-green-500 border-emerald-400';
+        return theme === "dark"
+          ? "bg-emerald-950/90 border border-emerald-800/50 shadow-2xl shadow-emerald-900/50"
+          : "bg-white border border-emerald-200 shadow-2xl shadow-emerald-500/10";
       case ToastType.ERROR:
-        return 'bg-gradient-to-r from-red-500 to-rose-500 border-red-400';
+        return theme === "dark"
+          ? "bg-red-950/90 border border-red-800/50 shadow-2xl shadow-red-900/50"
+          : "bg-white border border-red-200 shadow-2xl shadow-red-500/10";
       case ToastType.WARNING:
-        return 'bg-gradient-to-r from-amber-500 to-orange-500 border-amber-400';
-      case ToastType.INFO:
+        return theme === "dark"
+          ? "bg-amber-950/90 border border-amber-800/50 shadow-2xl shadow-amber-900/50"
+          : "bg-white border border-amber-200 shadow-2xl shadow-amber-500/10";
+      case ToastType.LOADING:
+        return theme === "dark"
+          ? "bg-blue-950/90 border border-blue-800/50 shadow-2xl shadow-blue-900/50"
+          : "bg-white border border-blue-200 shadow-2xl shadow-blue-500/10";
+      case ToastType.UPDATE:
+        return theme === "dark"
+          ? "bg-indigo-950/90 border border-indigo-800/50 shadow-2xl shadow-indigo-900/50"
+          : "bg-white border border-indigo-200 shadow-2xl shadow-indigo-500/10";
+      case ToastType.DELETE:
+        return theme === "dark"
+          ? "bg-red-950/90 border border-red-900/50 shadow-2xl shadow-red-900/50"
+          : "bg-white border border-red-300 shadow-2xl shadow-red-600/10";
+      case ToastType.UPLOAD:
+        return theme === "dark"
+          ? "bg-purple-950/90 border border-purple-800/50 shadow-2xl shadow-purple-900/50"
+          : "bg-white border border-purple-200 shadow-2xl shadow-purple-500/10";
+      case ToastType.DOWNLOAD:
+        return theme === "dark"
+          ? "bg-cyan-950/90 border border-cyan-800/50 shadow-2xl shadow-cyan-900/50"
+          : "bg-white border border-cyan-200 shadow-2xl shadow-cyan-500/10";
+      case ToastType.NETWORK:
+        return theme === "dark"
+          ? "bg-teal-950/90 border border-teal-800/50 shadow-2xl shadow-teal-900/50"
+          : "bg-white border border-teal-200 shadow-2xl shadow-teal-500/10";
+      case ToastType.OFFLINE:
+        return theme === "dark"
+          ? "bg-gray-900/90 border border-gray-700/50 shadow-2xl shadow-gray-900/50"
+          : "bg-white border border-gray-300 shadow-2xl shadow-gray-500/10";
+      case ToastType.CUSTOM:
+        return theme === "dark"
+          ? "bg-purple-950/90 border border-purple-700/50 shadow-2xl shadow-purple-900/50"
+          : "bg-white border border-purple-300 shadow-2xl shadow-purple-600/10";
       default:
-        return 'bg-gradient-to-r from-blue-500 to-cyan-500 border-blue-400';
+        return theme === "dark"
+          ? "bg-blue-950/90 border border-blue-800/50 shadow-2xl shadow-blue-900/50"
+          : "bg-white border border-blue-200 shadow-2xl shadow-blue-500/10";
+    }
+  };
+
+  const getIconBgColor = (): string => {
+    switch (type) {
+      case ToastType.SUCCESS:
+        return "bg-gradient-to-br from-emerald-400 to-emerald-600";
+      case ToastType.ERROR:
+        return "bg-gradient-to-br from-red-400 to-red-600";
+      case ToastType.WARNING:
+        return "bg-gradient-to-br from-amber-400 to-amber-600";
+      case ToastType.LOADING:
+        return "bg-gradient-to-br from-blue-400 to-blue-600";
+      case ToastType.UPDATE:
+        return "bg-gradient-to-br from-indigo-400 to-indigo-600";
+      case ToastType.DELETE:
+        return "bg-gradient-to-br from-red-500 to-red-700";
+      case ToastType.UPLOAD:
+        return "bg-gradient-to-br from-purple-400 to-purple-600";
+      case ToastType.DOWNLOAD:
+        return "bg-gradient-to-br from-cyan-400 to-cyan-600";
+      case ToastType.NETWORK:
+        return "bg-gradient-to-br from-teal-400 to-teal-600";
+      case ToastType.OFFLINE:
+        return "bg-gradient-to-br from-gray-400 to-gray-600";
+      case ToastType.CUSTOM:
+        return "bg-gradient-to-br from-purple-500 to-purple-700";
+      default:
+        return "bg-gradient-to-br from-blue-400 to-blue-600";
     }
   };
 
   const getProgressColor = (): string => {
     switch (type) {
       case ToastType.SUCCESS:
-        return 'bg-emerald-200';
+        return "bg-emerald-500";
       case ToastType.ERROR:
-        return 'bg-red-200';
+        return "bg-red-500";
       case ToastType.WARNING:
-        return 'bg-amber-200';
-      case ToastType.INFO:
+        return "bg-amber-500";
+      case ToastType.LOADING:
+        return "bg-blue-500";
+      case ToastType.UPDATE:
+        return "bg-indigo-500";
+      case ToastType.DELETE:
+        return "bg-red-600";
+      case ToastType.UPLOAD:
+        return "bg-purple-500";
+      case ToastType.DOWNLOAD:
+        return "bg-cyan-500";
+      case ToastType.NETWORK:
+        return "bg-teal-500";
+      case ToastType.OFFLINE:
+        return "bg-gray-500";
+      case ToastType.CUSTOM:
+        return "bg-purple-600";
       default:
-        return 'bg-blue-200';
+        return "bg-blue-500";
     }
   };
 
   const getIcon = (): JSX.Element => {
-    const iconClass = "w-6 h-6";
+    const iconClass = "w-4 h-4";
+
     switch (type) {
       case ToastType.SUCCESS:
         return (
-          <svg className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <CircleCheck className={`${iconClass} icon-success bg-green-500`} />
         );
       case ToastType.ERROR:
-        return (
-          <svg className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
+        return <XCircle className={`${iconClass} icon-error`} />;
       case ToastType.WARNING:
-        return (
-          <svg className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-        );
+        return <AlertTriangle className={`${iconClass} icon-warning`} />;
       case ToastType.INFO:
+        return <Info className={`${iconClass} icon-info`} />;
+      case ToastType.LOADING:
+        return <Loader2 className={`${iconClass} animate-spin`} />;
+      case ToastType.UPDATE:
+        return <RefreshCw className={`${iconClass} icon-update`} />;
+      case ToastType.DELETE:
+        return <Trash2 className={`${iconClass} icon-delete`} />;
+      case ToastType.UPLOAD:
+        return <Upload className={`${iconClass} icon-upload`} />;
+      case ToastType.DOWNLOAD:
+        return <Download className={`${iconClass} icon-download`} />;
+      case ToastType.NETWORK:
+        return <Wifi className={`${iconClass} icon-network`} />;
+      case ToastType.OFFLINE:
+        return <WifiOff className={`${iconClass} icon-offline`} />;
+      case ToastType.CUSTOM:
+        return <Star className={`${iconClass} icon-custom`} />;
       default:
-        return (
-          <svg className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
+        return <Info className={`${iconClass} icon-info`} />;
+    }
+  };
+
+  const getTransitionClass = (): string => {
+    if (isExiting) {
+      return "toast-exit";
+    }
+    switch (transition) {
+      case "bounce":
+        return "toast-bounce";
+      case "fade":
+        return "toast-fade";
+      case "zoom":
+        return "toast-zoom";
+      case "slide":
+        return "toast-slide";
+      case "slide-down":
+        return "animate-slide-down";
+      case "zoom-down":
+        return "animate-zoom-down";
+      default:
+        return "toast-slide";
     }
   };
 
   return (
     <div
       className={`
-        relative overflow-hidden
-        flex items-start gap-3 min-w-[320px] max-w-md p-4 rounded-xl shadow-2xl
-        text-white border-l-4
-        ${getTypeStyles()}
-        backdrop-blur-sm
-        transition-all duration-400 ease-out
-        ${isExiting 
-          ? 'opacity-0 translate-x-full scale-75' 
-          : 'opacity-100 translate-x-0 scale-100 animate-slideIn'
-        }
-        ${className || ''}
-        hover:shadow-3xl hover:scale-105
+        toast ${getTransitionClass()}
+        relative overflow-hidden flex items-center gap-2 
+        min-w-[250px] max-w-md px-2 py-1.5 rounded-lg
+        ${className ? className : getTypeStyles() || ""}
+        backdrop-blur-xl
       `}
       role="alert"
       aria-live="polite"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={(e) => {
+        if (closeOnClick && e.target === e.currentTarget) {
+          handleClose();
+        }
+      }}
     >
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
-      </div>
-
-      {/* Content */}
-      <div className="relative flex items-start gap-3 flex-1">
-        <div className="flex-shrink-0 mt-0.5" aria-hidden="true">
-          {getIcon()}
-        </div>
-        <div className="flex-1 pt-0.5">
-          <p className="text-sm font-medium leading-relaxed">{message}</p>
-        </div>
-        <button
-          onClick={handleClose}
-          className="flex-shrink-0 text-white/80 hover:text-white hover:bg-white/20 
-                     transition-all duration-200 focus:outline-none focus:ring-2 
-                     focus:ring-white/50 rounded-lg p-1 -mr-1 -mt-1"
-          aria-label="Close notification"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/20">
+      {showIcon && (
         <div
-          className={`h-full ${getProgressColor()} transition-all duration-100 ease-linear`}
-          style={{ width: `${progress}%` }}
-        />
+          className={`
+            icon-container
+            relative flex-shrink-0 w-8 h-8 rounded-full ${getIconBgColor()}
+            flex items-center justify-center text-white shadow-lg
+          `}
+          aria-hidden="true"
+        >
+          {getIcon()}
+          {
+            type === ToastType.SUCCESS
+            // && <span className="ripple" />
+          }
+        </div>
+      )}
+
+      <div className="relative flex-1 min-w-0">
+        <p
+          className={`text-sm font-semibold leading-snug
+                ${theme === "dark" ? "text-gray-100" : "text-gray-800"}`}
+        >
+          {message}
+        </p>
       </div>
+
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleClose();
+        }}
+        className="btn-close relative flex-shrink-0 text-gray-400 hover:cursor-pointer dark:text-gray-500
+             hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 
+             focus:outline-none rounded-full p-1 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
+        aria-label="Close notification"
+      >
+        <X className="w-4 h-4" />
+      </button>
+
+      {showProgressBar && duration && (
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black/5 dark:bg-white/5 overflow-hidden rounded-b-xl">
+          <div
+            className={`${getProgressColor()} h-full progress-bar-animated`}
+            style={{
+              animationDuration: `${duration}ms`,
+              animationPlayState: paused ? "paused" : "running",
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent shimmer" />
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        /* Toast Animations */
+        .toast {
+          will-change: transform, opacity;
+        }
+
+        .toast-slide {
+          animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast-bounce {
+          animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .toast-fade {
+          animation: fadeIn 0.3s ease-out;
+        }
+
+        .toast-zoom {
+          animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast-exit {
+          animation: slideOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+
+        @keyframes slideDown {
+           0% {
+              opacity: 0;
+              transform: translateY(-40px);
+            }
+            60% {
+              opacity: 1;
+              transform: translateY(8px);
+            }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-slide-down {
+          animation: slideDown 0.45s ease-out forwards;
+        }
+
+          @keyframes zoomDown {
+            0% {
+              opacity: 0;
+              transform: scale(0.8) translateY(-25px);
+            }
+            60% {
+              opacity: 1;
+              transform: scale(1.05) translateY(4px);
+            }
+            100% {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+            }
+          }
+
+        .animate-zoom-down {
+          animation: zoomDown 0.45s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        @keyframes slideIn {
+          from {
+            transform: translateX(calc(100% + 24px));
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideOut {
+          from {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(calc(100% + 24px));
+            opacity: 0;
+          }
+        }
+
+        @keyframes bounceIn {
+          0% {
+            transform: translateX(calc(100% + 24px)) scale(0.8);
+            opacity: 0;
+          }
+          50% {
+            transform: translateX(-10px) scale(1.05);
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(0) scale(1);
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes zoomIn {
+          from {
+            transform: scale(0);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+
+        /* Icon Animations */
+        .icon-container {
+          animation: iconPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes iconPop {
+          0% {
+            transform: scale(0) rotate(-180deg);
+          }
+          50% {
+            transform: scale(1.2) rotate(10deg);
+          }
+          100% {
+            transform: scale(1) rotate(0deg);
+          }
+        }
+
+        .icon-success {
+          animation: iconSuccess 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes iconSuccess {
+          0% {
+            transform: scale(0);
+          }
+          50% {
+            transform: scale(1.2);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+
+        .icon-error {
+          animation: iconError 0.5s ease-out;
+        }
+
+        @keyframes iconError {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(-10deg); }
+          75% { transform: rotate(10deg); }
+        }
+
+        .icon-warning {
+          animation: iconWarning 0.6s ease-out;
+        }
+
+        @keyframes iconWarning {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(20deg); }
+          75% { transform: rotate(-20deg); }
+        }
+
+        .icon-info {
+          animation: iconInfo 0.4s ease-out;
+        }
+
+        @keyframes iconInfo {
+          from {
+            transform: scale(0);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+
+        .icon-update {
+          animation: iconUpdate 2s linear infinite;
+        }
+
+        @keyframes iconUpdate {
+          from { transform: rotate(360deg); }
+          to { transform: rotate(0deg); }
+        }
+
+        .icon-delete {
+          animation: iconDelete 0.5s ease-out;
+        }
+
+        @keyframes iconDelete {
+          0% {
+            transform: scale(0) rotate(0deg);
+          }
+          50% {
+            transform: scale(1.3) rotate(180deg);
+          }
+          100% {
+            transform: scale(1) rotate(360deg);
+          }
+        }
+
+        .icon-upload {
+          animation: iconUpload 0.6s ease-out;
+        }
+
+        @keyframes iconUpload {
+          0% {
+            transform: translateY(20px);
+            opacity: 0;
+          }
+          60% {
+            transform: translateY(-5px);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(0);
+          }
+        }
+
+        .icon-download {
+          animation: iconDownload 0.6s ease-out;
+        }
+
+        @keyframes iconDownload {
+          0% {
+            transform: translateY(-20px);
+            opacity: 0;
+          }
+          60% {
+            transform: translateY(5px);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(0);
+          }
+        }
+
+        .icon-network {
+          animation: iconNetwork 1.5s ease-in-out infinite;
+        }
+
+        @keyframes iconNetwork {
+          0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.5;
+            transform: scale(1.1);
+          }
+        }
+
+        .icon-offline {
+          animation: iconOffline 0.5s ease-out;
+        }
+
+        @keyframes iconOffline {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.3;
+          }
+        }
+
+        .icon-custom {
+          animation: iconCustom 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes iconCustom {
+          0% {
+            transform: rotate(0deg) scale(0);
+          }
+          50% {
+            transform: rotate(180deg) scale(1.3);
+          }
+          100% {
+            transform: rotate(360deg) scale(1);
+          }
+        }
+
+        /* Ripple Effect */
+        .ripple {
+          position: absolute;
+          inset: -4px;
+          border: 3px solid currentColor;
+          border-radius: 50%;
+          animation: ripple 0.8s ease-out;
+          pointer-events: none;
+        }
+
+        @keyframes ripple {
+          0% {
+            transform: scale(0.8);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1.8);
+            opacity: 0;
+          }
+        }
+
+        /* Progress Bar */
+        .progress-bar-animated {
+          animation: progressReduce linear forwards;
+          box-shadow: 0 0 10px currentColor;
+        }
+
+        @keyframes progressReduce {
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
+        }
+
+        /* Shimmer Effect */
+        .shimmer {
+          animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(200%);
+          }
+        }
+
+        /* Close Button */
+        .btn-close:hover {
+          transform: rotate(90deg);
+        }
+
+        .btn-close:active {
+          transform: rotate(90deg) scale(0.9);
+        }
+
+        /* Toast Hover */
+        .toast:hover {
+          transform: translateY(-2px);
+          transition: transform 0.2s ease;
+        }
+
+        .toast:hover .icon-container {
+          transform: scale(1.05);
+          transition: transform 0.2s ease;
+        }
+      `}</style>
     </div>
   );
 };

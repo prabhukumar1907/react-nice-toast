@@ -1,8 +1,17 @@
+// types.ts
 export const ToastType = {
   SUCCESS: 'success',
   ERROR: 'error',
   WARNING: 'warning',
   INFO: 'info',
+  LOADING: 'loading',
+  UPDATE: 'update',
+  DELETE: 'delete',
+  UPLOAD: 'upload',
+  DOWNLOAD: 'download',
+  NETWORK: 'network',
+  OFFLINE: 'offline',
+  CUSTOM: 'custom',
 } as const;
 
 export type ToastType = (typeof ToastType)[keyof typeof ToastType];
@@ -18,10 +27,20 @@ export const Position = {
 
 export type Position = (typeof Position)[keyof typeof Position];
 
+export type Theme = 'light' | 'dark';
+export type Transition = 'fade' | 'slide' | 'bounce'|'zoom'|'slide-down'|'zoom-down';
+
 export interface ToastOptions {
   type?: ToastType;
-  duration?: number;
+  duration?: number; 
   position?: Position;
+  showProgressBar?: boolean;
+  showIcon?: boolean;
+  closeOnClick?: boolean;
+  newestOnTop?:boolean;
+  pauseOnHover?: boolean;
+  theme?: Theme;
+  transition?: Transition;
   className?: string;
 }
 
