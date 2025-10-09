@@ -27,8 +27,10 @@ class ToastManager {
       showIcon: options.showIcon ?? true,
       closeOnClick: options.closeOnClick ?? true,
       pauseOnHover: options.pauseOnHover ?? true,
+      showCloseButton:options.showCloseButton??true,
+      autoClose:options.autoClose ?? true,
       theme: options.theme ?? "light",
-      transition: options.transition ?? "bounce",
+      transition: options.transition ?? "zoom-down",
       newestOnTop: options.newestOnTop ?? false,
       className: options.className,
     };

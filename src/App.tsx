@@ -222,7 +222,7 @@ function App() {
           {/* CTA Button */}
           <div className="mt-4">
             <button
-              onClick={() => toast.success("Installation successful!")}
+              onClick={() => toast.success("Installation successful!",{autoClose:true})}
               className="px-6 py-4 bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 text-white cursor-pointer font-bold rounded-full shadow-lg transition-all hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,180,200,0.6)]"
             >
               Try Now
