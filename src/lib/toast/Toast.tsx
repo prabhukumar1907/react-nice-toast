@@ -13,8 +13,9 @@ import {
   WifiOff,
   Star,
   X,
+  CircleCheck,
 } from "lucide-react";
-import { FaRegCircleCheck } from "react-icons/fa6";
+
 interface ToastExtraProps {
   showProgressBar: boolean;
   showIcon: boolean;
@@ -36,8 +37,8 @@ const Toast: React.FC<ToastProps> = ({
   onRemove,
   showProgressBar = true,
   showIcon = true,
-  closeOnClick = true,
-  pauseOnHover = true,
+  closeOnClick = false,
+  pauseOnHover = false,
   theme = "light",
   transition = "slide",
 }) => {
@@ -46,13 +47,17 @@ const Toast: React.FC<ToastProps> = ({
 
   useEffect(() => {
     if (!duration || paused) return;
+
     const timer = setTimeout(() => handleClose(), duration);
-    return () => clearTimeout(timer);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [duration, paused]);
 
   const handleClose = (): void => {
     setIsExiting(true);
-    setTimeout(() => onRemove(id), 100);
+    setTimeout(() => onRemove(id), 300);
   };
 
   const handleMouseEnter = () => pauseOnHover && setPaused(true);
@@ -61,240 +66,605 @@ const Toast: React.FC<ToastProps> = ({
   const getTypeStyles = (): string => {
     switch (type) {
       case ToastType.SUCCESS:
-        return "border-emerald-200/70 shadow-emerald-100/50 dark:border-emerald-800/60 dark:shadow-emerald-900/30";
+        return theme === "dark"
+          ? "bg-emerald-950/90 border border-emerald-800/50 shadow-2xl shadow-emerald-900/50"
+          : "bg-white border border-emerald-200 shadow-2xl shadow-emerald-500/10";
       case ToastType.ERROR:
-        return "border-red-200/70 shadow-red-100/50 dark:border-red-800/60 dark:shadow-red-900/30";
+        return theme === "dark"
+          ? "bg-red-950/90 border border-red-800/50 shadow-2xl shadow-red-900/50"
+          : "bg-white border border-red-200 shadow-2xl shadow-red-500/10";
       case ToastType.WARNING:
-        return "border-amber-200/70 shadow-amber-100/50 dark:border-amber-700/60 dark:shadow-amber-900/30";
+        return theme === "dark"
+          ? "bg-amber-950/90 border border-amber-800/50 shadow-2xl shadow-amber-900/50"
+          : "bg-white border border-amber-200 shadow-2xl shadow-amber-500/10";
       case ToastType.LOADING:
-        return "border-gray-200/70 shadow-gray-100/50 dark:border-gray-700/60 dark:shadow-gray-900/30";
+        return theme === "dark"
+          ? "bg-blue-950/90 border border-blue-800/50 shadow-2xl shadow-blue-900/50"
+          : "bg-white border border-blue-200 shadow-2xl shadow-blue-500/10";
       case ToastType.UPDATE:
-        return "border-indigo-200/70 shadow-indigo-100/50 dark:border-indigo-800/60 dark:shadow-indigo-900/30";
+        return theme === "dark"
+          ? "bg-indigo-950/90 border border-indigo-800/50 shadow-2xl shadow-indigo-900/50"
+          : "bg-white border border-indigo-200 shadow-2xl shadow-indigo-500/10";
       case ToastType.DELETE:
-        return "border-red-300/70 shadow-red-200/50 dark:border-red-900/60 dark:shadow-red-900/40";
+        return theme === "dark"
+          ? "bg-red-950/90 border border-red-900/50 shadow-2xl shadow-red-900/50"
+          : "bg-white border border-red-300 shadow-2xl shadow-red-600/10";
       case ToastType.UPLOAD:
-        return "border-purple-200/70 shadow-purple-100/50 dark:border-purple-800/60 dark:shadow-purple-900/30";
+        return theme === "dark"
+          ? "bg-purple-950/90 border border-purple-800/50 shadow-2xl shadow-purple-900/50"
+          : "bg-white border border-purple-200 shadow-2xl shadow-purple-500/10";
       case ToastType.DOWNLOAD:
-        return "border-cyan-200/70 shadow-cyan-100/50 dark:border-cyan-800/60 dark:shadow-cyan-900/30";
+        return theme === "dark"
+          ? "bg-cyan-950/90 border border-cyan-800/50 shadow-2xl shadow-cyan-900/50"
+          : "bg-white border border-cyan-200 shadow-2xl shadow-cyan-500/10";
       case ToastType.NETWORK:
-        return "border-teal-200/70 shadow-teal-100/50 dark:border-teal-800/60 dark:shadow-teal-900/30";
+        return theme === "dark"
+          ? "bg-teal-950/90 border border-teal-800/50 shadow-2xl shadow-teal-900/50"
+          : "bg-white border border-teal-200 shadow-2xl shadow-teal-500/10";
       case ToastType.OFFLINE:
-        return "border-gray-400/70 shadow-gray-300/50 dark:border-gray-600/60 dark:shadow-gray-800/30";
+        return theme === "dark"
+          ? "bg-gray-900/90 border border-gray-700/50 shadow-2xl shadow-gray-900/50"
+          : "bg-white border border-gray-300 shadow-2xl shadow-gray-500/10";
       case ToastType.CUSTOM:
-        return "border-purple-300/70 shadow-purple-200/50 dark:border-purple-700/60 dark:shadow-purple-900/30";
+        return theme === "dark"
+          ? "bg-purple-950/90 border border-purple-700/50 shadow-2xl shadow-purple-900/50"
+          : "bg-white border border-purple-300 shadow-2xl shadow-purple-600/10";
       default:
-        return "border-blue-200/70 shadow-blue-100/50 dark:border-blue-800/60 dark:shadow-blue-900/30";
+        return theme === "dark"
+          ? "bg-blue-950/90 border border-blue-800/50 shadow-2xl shadow-blue-900/50"
+          : "bg-white border border-blue-200 shadow-2xl shadow-blue-500/10";
     }
   };
 
   const getIconBgColor = (): string => {
     switch (type) {
       case ToastType.SUCCESS:
-        return "bg-gradient-to-br from-green-50 to-green-50 dark:from-green-900/30 dark:to-green-900/20";
+        return "bg-gradient-to-br from-emerald-400 to-emerald-600";
       case ToastType.ERROR:
-        return "bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/30 dark:to-rose-900/20";
+        return "bg-gradient-to-br from-red-400 to-red-600";
       case ToastType.WARNING:
-        return "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/20";
+        return "bg-gradient-to-br from-amber-400 to-amber-600";
       case ToastType.LOADING:
-        return "bg-gradient-to-br from-teal-100 to-teal-200 dark:from-teal-800/30 dark:to-teal-700/20";
+        return "bg-gradient-to-br from-blue-400 to-blue-600";
       case ToastType.UPDATE:
-        return "bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/20";
+        return "bg-gradient-to-br from-indigo-400 to-indigo-600";
       case ToastType.DELETE:
-        return "bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/20";
+        return "bg-gradient-to-br from-red-500 to-red-700";
       case ToastType.UPLOAD:
-        return "bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/20";
+        return "bg-gradient-to-br from-purple-400 to-purple-600";
       case ToastType.DOWNLOAD:
-        return "bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900/30 dark:to-cyan-800/20";
+        return "bg-gradient-to-br from-cyan-400 to-cyan-600";
       case ToastType.NETWORK:
-        return "bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-900/30 dark:to-teal-800/20";
+        return "bg-gradient-to-br from-teal-400 to-teal-600";
       case ToastType.OFFLINE:
-        return "bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700/30 dark:to-gray-600/20";
+        return "bg-gradient-to-br from-gray-400 to-gray-600";
       case ToastType.CUSTOM:
-        return "bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/20";
+        return "bg-gradient-to-br from-purple-500 to-purple-700";
       default:
-        return "bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/30 dark:to-cyan-900/20";
-    }
-  };
-
-  const getIconColor = (): string => {
-    switch (type) {
-      case ToastType.SUCCESS:
-        return "text-emerald-600 dark:text-emerald-400";
-      case ToastType.ERROR:
-        return "text-red-600 dark:text-red-400";
-      case ToastType.WARNING:
-        return "text-amber-600 dark:text-amber-400";
-      case ToastType.LOADING:
-        return "text-teal-700 dark:text-teal-300";
-      case ToastType.UPDATE:
-        return "text-indigo-600 dark:text-indigo-400";
-      case ToastType.DELETE:
-        return "text-red-700 dark:text-red-400";
-      case ToastType.UPLOAD:
-        return "text-purple-600 dark:text-purple-400";
-      case ToastType.DOWNLOAD:
-        return "text-cyan-600 dark:text-cyan-400";
-      case ToastType.NETWORK:
-        return "text-teal-600 dark:text-teal-400";
-      case ToastType.OFFLINE:
-        return "text-gray-600 dark:text-gray-300";
-      case ToastType.CUSTOM:
-        return "text-purple-700 dark:text-purple-400";
-      default:
-        return "text-blue-600 dark:text-blue-400";
+        return "bg-gradient-to-br from-blue-400 to-blue-600";
     }
   };
 
   const getProgressColor = (): string => {
     switch (type) {
       case ToastType.SUCCESS:
-        return "bg-gradient-to-r from-emerald-400 via-emerald-500 to-green-500 dark:from-emerald-500 dark:via-emerald-600 dark:to-green-600";
+        return "bg-emerald-500";
       case ToastType.ERROR:
-        return "bg-gradient-to-r from-red-400 via-red-500 to-rose-500 dark:from-red-500 dark:via-red-600 dark:to-rose-600";
+        return "bg-red-500";
       case ToastType.WARNING:
-        return "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 dark:from-amber-500 dark:via-amber-600 dark:to-orange-600";
+        return "bg-amber-500";
       case ToastType.LOADING:
-        return "bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 dark:from-teal-500 dark:via-teal-600 dark:to-teal-700";
+        return "bg-blue-500";
+      case ToastType.UPDATE:
+        return "bg-indigo-500";
+      case ToastType.DELETE:
+        return "bg-red-600";
+      case ToastType.UPLOAD:
+        return "bg-purple-500";
+      case ToastType.DOWNLOAD:
+        return "bg-cyan-500";
+      case ToastType.NETWORK:
+        return "bg-teal-500";
+      case ToastType.OFFLINE:
+        return "bg-gray-500";
+      case ToastType.CUSTOM:
+        return "bg-purple-600";
       default:
-        return "bg-gradient-to-r from-blue-400 via-blue-500 to-cyan-500 dark:from-blue-500 dark:via-blue-600 dark:to-cyan-600";
+        return "bg-blue-500";
     }
   };
 
   const getIcon = (): JSX.Element => {
     const iconClass = "w-4 h-4";
+
     switch (type) {
       case ToastType.SUCCESS:
-        return <FaRegCircleCheck className={iconClass} />;
+        return (
+          <CircleCheck className={`${iconClass} icon-success bg-green-500`} />
+        );
       case ToastType.ERROR:
-        return <XCircle className={iconClass} />;
+        return <XCircle className={`${iconClass} icon-error`} />;
       case ToastType.WARNING:
-        return <AlertTriangle className={iconClass} />;
+        return <AlertTriangle className={`${iconClass} icon-warning`} />;
       case ToastType.INFO:
-        return <Info className={iconClass} />;
+        return <Info className={`${iconClass} icon-info`} />;
       case ToastType.LOADING:
         return <Loader2 className={`${iconClass} animate-spin`} />;
       case ToastType.UPDATE:
-        return <RefreshCw className={iconClass} />;
+        return <RefreshCw className={`${iconClass} icon-update`} />;
       case ToastType.DELETE:
-        return <Trash2 className={iconClass} />;
+        return <Trash2 className={`${iconClass} icon-delete`} />;
       case ToastType.UPLOAD:
-        return <Upload className={iconClass} />;
+        return <Upload className={`${iconClass} icon-upload`} />;
       case ToastType.DOWNLOAD:
-        return <Download className={iconClass} />;
+        return <Download className={`${iconClass} icon-download`} />;
       case ToastType.NETWORK:
-        return <Wifi className={iconClass} />;
+        return <Wifi className={`${iconClass} icon-network`} />;
       case ToastType.OFFLINE:
-        return <WifiOff className={iconClass} />;
+        return <WifiOff className={`${iconClass} icon-offline`} />;
       case ToastType.CUSTOM:
-        return <Star className={iconClass} />;
+        return <Star className={`${iconClass} icon-custom`} />;
       default:
-        return <Info className={iconClass} />;
+        return <Info className={`${iconClass} icon-info`} />;
+    }
+  };
+
+  const getTransitionClass = (): string => {
+    if (isExiting) {
+      return "toast-exit";
+    }
+    switch (transition) {
+      case "bounce":
+        return "toast-bounce";
+      case "fade":
+        return "toast-fade";
+      case "zoom":
+        return "toast-zoom";
+      case "slide":
+        return "toast-slide";
+      case "slide-down":
+        return "animate-slide-down";
+      case "zoom-down":
+        return "animate-zoom-down";
+      default:
+        return "toast-slide";
     }
   };
 
   return (
     <div
       className={`
-        relative overflow-hidden flex items-center gap-3 
-        min-w-[320px] max-w-md px-2.5 py-2.5 rounded-lg
-        ${
-          theme === "light" ? "bg-white" : "bg-gray-900"
-        } shadow-lg border-1 ${getTypeStyles()}
-        transition-all duration-300 ease-out
-        ${transition === "bounce" ? "animate-bounce" : ""}
-        ${
-          transition === "fade"
-            ? "opacity-100 transition-opacity duration-500"
-            : ""
-        }
-        ${transition === "slide" ? "translate-y-0" : ""}
-        ${transition === "zoom" ? "scale-105" : ""}
-        ${
-          isExiting
-            ? "opacity-0 translate-y-2 scale-95"
-            : "opacity-100 translate-y-0 scale-100"
-        }
-        ${className || ""}
-        hover:shadow-xl hover:scale-[1.02] hover:-translate-y-0.5
+        toast ${getTransitionClass()}
+        relative overflow-hidden flex items-center gap-2 
+        min-w-[250px] max-w-md px-2 py-1.5 rounded-lg
+        ${className ? className : getTypeStyles() || ""}
+        backdrop-blur-xl
       `}
       role="alert"
       aria-live="polite"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={() => closeOnClick && handleClose()}
+      onClick={(e) => {
+        if (closeOnClick && e.target === e.currentTarget) {
+          handleClose();
+        }
+      }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-gray-50/20 dark:from-gray-800 dark:via-transparent dark:to-gray-700/20 pointer-events-none" />
-
       {showIcon && (
         <div
-          className={`relative flex-shrink-0 w-7 h-7 rounded-full ${getIconBgColor()} ${getIconColor()} 
-                      flex items-center justify-center shadow-lg ring-1 ring-black/10 dark:ring-white/20`}
+          className={`
+            icon-container
+            relative flex-shrink-0 w-8 h-8 rounded-full ${getIconBgColor()}
+            flex items-center justify-center text-white shadow-lg
+          `}
           aria-hidden="true"
         >
           {getIcon()}
+          {
+            type === ToastType.SUCCESS
+            // && <span className="ripple" />
+          }
         </div>
       )}
 
       <div className="relative flex-1 min-w-0">
         <p
-          className={`text-sm font-semibold leading-snug tracking-tight 
-                ${theme === "dark" ? "text-white" : "text-gray-900"} 
-                dark:text-gray-100`}
+          className={`text-sm font-semibold leading-snug
+                ${theme === "dark" ? "text-gray-100" : "text-gray-800"}`}
         >
           {message}
         </p>
       </div>
-      {/* SVG Button */}
-      {/* <button
-        onClick={handleClose}
-        className="relative flex-shrink-0 left-1.5 text-gray-400 dark:text-gray-500 cursor-pointer 
-                   hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 
-                   focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600
-                   rounded-full p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 hover:rotate-90"
-        aria-label="Close notification"
-      >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2.5}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
-      </button> */}
-      {/* Icon Button  */}
+
       <button
-        onClick={handleClose}
-        className="relative flex-shrink-0 left-1.5 text-gray-400 dark:text-gray-500 cursor-pointer 
+        onClick={(e) => {
+          e.stopPropagation();
+          handleClose();
+        }}
+        className="btn-close relative flex-shrink-0 text-gray-400 hover:cursor-pointer dark:text-gray-500
              hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 
-             focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600
-             rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:rotate-90"
+             focus:outline-none rounded-full p-1 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
         aria-label="Close notification"
       >
         <X className="w-4 h-4" />
       </button>
 
-      {showProgressBar && (
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-100/80 dark:bg-gray-800/70 overflow-hidden rounded-b-xl">
+      {showProgressBar && duration && (
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black/5 dark:bg-white/5 overflow-hidden rounded-b-xl">
           <div
-            className={`${getProgressColor()} h-full animate-progress relative overflow-hidden shadow-sm`}
-            style={{ animationDuration: `${duration}ms` }}
+            className={`${getProgressColor()} h-full progress-bar-animated`}
+            style={{
+              animationDuration: `${duration}ms`,
+              animationPlayState: paused ? "paused" : "running",
+            }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent dark:via-gray-200/20 animate-shimmer" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent shimmer" />
           </div>
         </div>
       )}
 
       <style>{`
-        @keyframes progress { from { width: 100%; } to { width: 0%; } }
-        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
-        .animate-progress { animation: progress linear forwards; }
-        .animate-shimmer { animation: shimmer 2s infinite; }
+        /* Toast Animations */
+        .toast {
+          will-change: transform, opacity;
+        }
+
+        .toast-slide {
+          animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast-bounce {
+          animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .toast-fade {
+          animation: fadeIn 0.3s ease-out;
+        }
+
+        .toast-zoom {
+          animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast-exit {
+          animation: slideOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+
+        @keyframes slideDown {
+           0% {
+              opacity: 0;
+              transform: translateY(-40px);
+            }
+            60% {
+              opacity: 1;
+              transform: translateY(8px);
+            }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-slide-down {
+          animation: slideDown 0.45s ease-out forwards;
+        }
+
+          @keyframes zoomDown {
+            0% {
+              opacity: 0;
+              transform: scale(0.8) translateY(-25px);
+            }
+            60% {
+              opacity: 1;
+              transform: scale(1.05) translateY(4px);
+            }
+            100% {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+            }
+          }
+
+        .animate-zoom-down {
+          animation: zoomDown 0.45s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        @keyframes slideIn {
+          from {
+            transform: translateX(calc(100% + 24px));
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideOut {
+          from {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(calc(100% + 24px));
+            opacity: 0;
+          }
+        }
+
+        @keyframes bounceIn {
+          0% {
+            transform: translateX(calc(100% + 24px)) scale(0.8);
+            opacity: 0;
+          }
+          50% {
+            transform: translateX(-10px) scale(1.05);
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(0) scale(1);
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes zoomIn {
+          from {
+            transform: scale(0);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+
+        /* Icon Animations */
+        .icon-container {
+          animation: iconPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes iconPop {
+          0% {
+            transform: scale(0) rotate(-180deg);
+          }
+          50% {
+            transform: scale(1.2) rotate(10deg);
+          }
+          100% {
+            transform: scale(1) rotate(0deg);
+          }
+        }
+
+        .icon-success {
+          animation: iconSuccess 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes iconSuccess {
+          0% {
+            transform: scale(0);
+          }
+          50% {
+            transform: scale(1.2);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+
+        .icon-error {
+          animation: iconError 0.5s ease-out;
+        }
+
+        @keyframes iconError {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(-10deg); }
+          75% { transform: rotate(10deg); }
+        }
+
+        .icon-warning {
+          animation: iconWarning 0.6s ease-out;
+        }
+
+        @keyframes iconWarning {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(20deg); }
+          75% { transform: rotate(-20deg); }
+        }
+
+        .icon-info {
+          animation: iconInfo 0.4s ease-out;
+        }
+
+        @keyframes iconInfo {
+          from {
+            transform: scale(0);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+
+        .icon-update {
+          animation: iconUpdate 2s linear infinite;
+        }
+
+        @keyframes iconUpdate {
+          from { transform: rotate(360deg); }
+          to { transform: rotate(0deg); }
+        }
+
+        .icon-delete {
+          animation: iconDelete 0.5s ease-out;
+        }
+
+        @keyframes iconDelete {
+          0% {
+            transform: scale(0) rotate(0deg);
+          }
+          50% {
+            transform: scale(1.3) rotate(180deg);
+          }
+          100% {
+            transform: scale(1) rotate(360deg);
+          }
+        }
+
+        .icon-upload {
+          animation: iconUpload 0.6s ease-out;
+        }
+
+        @keyframes iconUpload {
+          0% {
+            transform: translateY(20px);
+            opacity: 0;
+          }
+          60% {
+            transform: translateY(-5px);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(0);
+          }
+        }
+
+        .icon-download {
+          animation: iconDownload 0.6s ease-out;
+        }
+
+        @keyframes iconDownload {
+          0% {
+            transform: translateY(-20px);
+            opacity: 0;
+          }
+          60% {
+            transform: translateY(5px);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(0);
+          }
+        }
+
+        .icon-network {
+          animation: iconNetwork 1.5s ease-in-out infinite;
+        }
+
+        @keyframes iconNetwork {
+          0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.5;
+            transform: scale(1.1);
+          }
+        }
+
+        .icon-offline {
+          animation: iconOffline 0.5s ease-out;
+        }
+
+        @keyframes iconOffline {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.3;
+          }
+        }
+
+        .icon-custom {
+          animation: iconCustom 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes iconCustom {
+          0% {
+            transform: rotate(0deg) scale(0);
+          }
+          50% {
+            transform: rotate(180deg) scale(1.3);
+          }
+          100% {
+            transform: rotate(360deg) scale(1);
+          }
+        }
+
+        /* Ripple Effect */
+        .ripple {
+          position: absolute;
+          inset: -4px;
+          border: 3px solid currentColor;
+          border-radius: 50%;
+          animation: ripple 0.8s ease-out;
+          pointer-events: none;
+        }
+
+        @keyframes ripple {
+          0% {
+            transform: scale(0.8);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1.8);
+            opacity: 0;
+          }
+        }
+
+        /* Progress Bar */
+        .progress-bar-animated {
+          animation: progressReduce linear forwards;
+          box-shadow: 0 0 10px currentColor;
+        }
+
+        @keyframes progressReduce {
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
+        }
+
+        /* Shimmer Effect */
+        .shimmer {
+          animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(200%);
+          }
+        }
+
+        /* Close Button */
+        .btn-close:hover {
+          transform: rotate(90deg);
+        }
+
+        .btn-close:active {
+          transform: rotate(90deg) scale(0.9);
+        }
+
+        /* Toast Hover */
+        .toast:hover {
+          transform: translateY(-2px);
+          transition: transform 0.2s ease;
+        }
+
+        .toast:hover .icon-container {
+          transform: scale(1.05);
+          transition: transform 0.2s ease;
+        }
       `}</style>
     </div>
   );

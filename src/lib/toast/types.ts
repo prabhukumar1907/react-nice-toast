@@ -28,7 +28,7 @@ export const Position = {
 export type Position = (typeof Position)[keyof typeof Position];
 
 export type Theme = 'light' | 'dark';
-export type Transition = 'fade' | 'slide' | 'bounce'|'zoom';
+export type Transition = 'fade' | 'slide' | 'bounce'|'zoom'|'slide-down'|'zoom-down';
 
 export interface ToastOptions {
   type?: ToastType;

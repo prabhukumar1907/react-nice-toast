@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { toastManager } from "./toastManager";
 import Toast from "./Toast";
-import { Position, type ToastData } from "./types";
+import { Position, type ToastData, type Transition } from "./types";
 
 interface ToastContainerProps {
   position?: Position;
@@ -11,7 +11,7 @@ interface ToastContainerProps {
   closeOnClick?: boolean;
   pauseOnHover?: boolean;
   theme?: "light" | "dark";
-  transition?: "slide" | "zoom" | "bounce" | "fade";
+  transition?: Transition ;
 
 }
 

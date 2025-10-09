@@ -76,8 +76,7 @@ function App() {
         maxToasts={5}
         closeOnClick
         pauseOnHover
-        theme="light"
-        transition="slide"
+        transition="zoom-down"
         showProgressBar
         showIcon
       />
@@ -346,7 +345,7 @@ function App() {
 
         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 relative z-10">
           <button
-            onClick={() => toast.success("Operation completed successfully!!")}
+            onClick={() => toast.success("Operation completed successfully!")}
             className="flex items-center justify-center gap-3 bg-blue-500 cursor-pointer text-white px-6 py-4 rounded-xl shadow-lg hover:bg-blue-600 transition-colors font-medium"
           >
             <CheckCircle size={20} /> Success
