@@ -251,7 +251,7 @@ const Toast: React.FC<ToastProps> = ({
         <div
           className={`
             rnt-icon-container
-            relative flex-shrink-0 w-8 h-8 rounded-full ${getIconBgColor()}
+            relative flex-shrink-0 w-6 h-6 rounded-full ${getIconBgColor()}
             flex items-center justify-center text-white shadow-lg
           `}
           aria-hidden="true"
